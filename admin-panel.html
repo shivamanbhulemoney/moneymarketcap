@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneyMarketCap - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #e94560;
+            --tertiary: #16213e;
+            --bg-dark: #0f0f1a;
+            --text-light: #ffffff;
+            --text-gray: #d1d5db;
+            --text-muted: #9ca3af;
+            --border: #2a2a3e;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            border-right: 1px solid var(--border);
+            padding: 2rem 1.5rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            color: var(--secondary);
+        }
+
+        .nav-item {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: rgba(233, 69, 96, 0.1);
+            border-left-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 900;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #d83f50;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(233, 69, 96, 0.1);
+            color: var(--secondary);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        /* FORMS */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-light);
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: var(--secondary);
+        }
+
+        /* TABLES */
+        .table-container {
+            overflow-x: auto;
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--tertiary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background-color: rgba(233, 69, 96, 0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-published {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-draft {
+            background-color: rgba(251, 146, 60, 0.2);
+            color: #f97316;
+        }
+
+        .status-scheduled {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--secondary);
+        }
+
+        /* ALERTS */
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.2);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .alert-info {
+            background-color: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #3b82f6;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                padding: 1rem;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            td, th {
+                padding: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">💼 Admin Panel</div>
+            <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">📊 Dashboard</a>
+            <a href="#posts" class="nav-item" onclick="showSection('posts')">📝 Posts</a>
+            <a href="#create" class="nav-item" onclick="showSection('create')">✏️ Create Post</a>
+            <a href="#schedule" class="nav-item" onclick="showSection('schedule')">📅 Scheduled Posts</a>
+            <a href="#amp" class="nav-item" onclick="showSection('amp')">⚡ AMP Stories</a>
+            <a href="#analytics" class="nav-item" onclick="showSection('analytics')">📈 Analytics</a>
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 2rem 0;\">\n            <a href="../index.html" class="nav-item">👁️ View Website</a>\n            <a href="#logout" class="nav-item" onclick="logout()\" style=\"color: var(--danger);\">🚪 Logout</a>\n        </aside>\n\n        <!-- MAIN CONTENT -->\n        <main class=\"main-content\">\n            <!-- DASHBOARD SECTION -->\n            <section id=\"dashboard\" class=\"section active\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">Dashboard</h1>\n                </div>\n\n                <div class=\"stats-grid\">\n                    <div class=\"stat-card\">\n                        <div class=\"stat-label\">Total Posts</div>\n                        <div class=\"stat-value\" id=\"totalPosts\">0</div>\n                    </div>\n                    <div class=\"stat-card\">\n                        <div class=\"stat-label\">Published</div>\n                        <div class=\"stat-value\" id=\"publishedPosts\">0</div>\n                    </div>\n                    <div class=\"stat-card\">\n                        <div class=\"stat-label\">Scheduled</div>\n                        <div class=\"stat-value\" id=\"scheduledPosts\">0</div>\n                    </div>\n                    <div class=\"stat-card\">\n                        <div class=\"stat-label\">Drafts</div>\n                        <div class=\"stat-value\" id=\"draftPosts\">0</div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- CREATE POST SECTION -->\n            <section id=\"create\" class=\"section\" style=\"display: none;\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">Create New Post</h1>\n                </div>\n\n                <div id=\"alertContainer\"></div>\n\n                <div style=\"background-color: var(--primary); border: 1px solid var(--border); border-radius: 8px; padding: 2rem;\">\n                    <form id=\"postForm\">\n                        <div class=\"form-group\">\n                            <label for=\"title\">Article Title *</label>\n                            <input type=\"text\" id=\"title\" required placeholder=\"Enter article title\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"category\">Category *</label>\n                            <select id=\"category\" required>\n                                <option value=\"\">Select category</option>\n                                <option value=\"crypto\">Cryptocurrency</option>\n                                <option value=\"stocks\">Stocks</option>\n                                <option value=\"forex\">Forex</option>\n                                <option value=\"economy\">Economy</option>\n                                <option value=\"tech\">Technology</option>\n                            </select>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"excerpt\">Excerpt *</label>\n                            <textarea id=\"excerpt\" required placeholder=\"Brief summary of the article\"></textarea>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"content\">Content *</label>\n                            <textarea id=\"content\" required placeholder=\"Full article content\" style=\"min-height: 300px;\"></textarea>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"author\">Author *</label>\n                            <input type=\"text\" id=\"author\" required placeholder=\"Author name\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"image\">Image URL *</label>\n                            <input type=\"text\" id=\"image\" required placeholder=\"https://example.com/image.jpg\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"tags\">Tags (comma-separated) *</label>\n                            <input type=\"text\" id=\"tags\" required placeholder=\"tag1, tag2, tag3\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"readingTime\">Reading Time *</label>\n                            <input type=\"text\" id=\"readingTime\" required placeholder=\"5 min read\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"featured\">Featured Article</label>\n                            <input type=\"checkbox\" id=\"featured\" style=\"width: auto;\">\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"publishDate\">Publish Date/Time *</label>\n                            <input type=\"datetime-local\" id=\"publishDate\" required>\n                        </div>\n\n                        <div class=\"form-group\">\n                            <label for=\"status\">Status *</label>\n                            <select id=\"status\" required>\n                                <option value=\"draft\">Draft</option>\n                                <option value=\"scheduled\">Scheduled</option>\n                                <option value=\"published\">Published</option>\n                            </select>\n                        </div>\n\n                        <div style=\"display: flex; gap: 1rem;\">\n                            <button type=\"submit\" class=\"btn btn-primary\">Save Post</button>\n                            <button type=\"button\" class=\"btn btn-secondary\" onclick=\"resetForm()\">Clear</button>\n                        </div>\n                    </form>\n                </div>\n            </section>\n\n            <!-- POSTS SECTION -->\n            <section id=\"posts\" class=\"section\" style=\"display: none;\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">All Posts</h1>\n                    <button class=\"btn btn-primary\" onclick=\"showSection('create')\">+ Create Post</button>\n                </div>\n\n                <div class=\"table-container\">\n                    <table id=\"postsTable\">\n                        <thead>\n                            <tr>\n                                <th>Title</th>\n                                <th>Category</th>\n                                <th>Author</th>\n                                <th>Date</th>\n                                <th>Status</th>\n                                <th>Actions</th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"postsTableBody\">\n                            <!-- Populated by JS -->\n                        </tbody>\n                    </table>\n                </div>\n            </section>\n\n            <!-- SCHEDULED POSTS SECTION -->\n            <section id=\"schedule\" class=\"section\" style=\"display: none;\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">Scheduled Posts</h1>\n                </div>\n\n                <div class=\"table-container\">\n                    <table>\n                        <thead>\n                            <tr>\n                                <th>Title</th>\n                                <th>Category</th>\n                                <th>Scheduled For</th>\n                                <th>Auto-Publish</th>\n                                <th>Actions</th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"scheduledTableBody\">\n                            <!-- Populated by JS -->\n                        </tbody>\n                    </table>\n                </div>\n            </section>\n\n            <!-- AMP STORIES SECTION -->\n            <section id=\"amp\" class=\"section\" style=\"display: none;\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">AMP Web Stories</h1>\n                    <button class=\"btn btn-primary\" onclick=\"createAMPStory()\">+ Create AMP Story</button>\n                </div>\n\n                <div style=\"background-color: var(--primary); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; margin-bottom: 2rem;\">\n                    <h3 style=\"margin-bottom: 1rem;\">What are AMP Web Stories?</h3>\n                    <p style=\"color: var(--text-gray); line-height: 1.8;\">\n                        AMP Web Stories are a web-based format for telling visual stories on the open web. They're optimized for mobile devices and load instantly. Perfect for sharing financial news and market updates in an engaging, immersive format.\n                    </p>\n                    <p style=\"color: var(--text-muted); margin-top: 1rem; font-size: 0.9rem;\">\n                        <strong>Benefits:</strong> Better mobile experience • Faster loading • Higher engagement • SEO friendly • Shareable across social media\n                    </p>\n                </div>\n\n                <div class=\"table-container\">\n                    <table>\n                        <thead>\n                            <tr>\n                                <th>Title</th>\n                                <th>Pages</th>\n                                <th>Created</th>\n                                <th>Status</th>\n                                <th>Actions</th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"ampStoriesBody\">\n                            <!-- Populated by JS -->\n                        </tbody>\n                    </table>\n                </div>\n            </section>\n\n            <!-- ANALYTICS SECTION -->\n            <section id=\"analytics\" class=\"section\" style=\"display: none;\">\n                <div class=\"header\">\n                    <h1 class=\"page-title\">Analytics</h1>\n                </div>\n\n                <div style=\"background-color: var(--primary); border: 1px solid var(--border); border-radius: 8px; padding: 2rem;\">\n                    <h3>Coming Soon</h3>\n                    <p style=\"color: var(--text-gray); margin-top: 1rem;\">\n                        View detailed analytics about your posts, including views, engagement, and social shares.\n                    </p>\n                </div>\n            </section>\n        </main>\n    </div>\n\n    <!-- MODAL FOR EDITING -->\n    <div class=\"modal\" id=\"editModal\">\n        <div class=\"modal-content\">\n            <div class=\"modal-header\">\n                <h2 class=\"modal-title\">Edit Post</h2>\n                <button class=\"modal-close\" onclick=\"closeModal()\">×</button>\n            </div>\n            <form id=\"editForm\">\n                <div class=\"form-group\">\n                    <label for=\"editTitle\">Title</label>\n                    <input type=\"text\" id=\"editTitle\" required>\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"editStatus\">Status</label>\n                    <select id=\"editStatus\">\n                        <option value=\"draft\">Draft</option>\n                        <option value=\"scheduled\">Scheduled</option>\n                        <option value=\"published\">Published</option>\n                    </select>\n                </div>\n                <div style=\"display: flex; gap: 1rem;\">\n                    <button type=\"submit\" class=\"btn btn-primary\">Save Changes</button>\n                    <button type=\"button\" class=\"btn btn-secondary\" onclick=\"closeModal()\">Cancel</button>\n                </div>\n            </form>\n        </div>\n    </div>\n\n    <script>\n        // ===== LOCAL STORAGE MANAGEMENT =====\n        const POSTS_KEY = 'moneymarketcap_posts';\n        const AMP_STORIES_KEY = 'moneymarketcap_amp_stories';\n        const ADMIN_KEY = 'moneymarketcap_admin';\n\n        // Initialize admin user\n        if (!localStorage.getItem(ADMIN_KEY)) {\n            localStorage.setItem(ADMIN_KEY, JSON.stringify({\n                username: 'admin',\n                password: 'admin123', // CHANGE THIS IN PRODUCTION\n                email: 'admin@moneymarketcap.com'\n            }));\n        }\n\n        // Initialize sample posts\n        function initializePosts() {\n            if (!localStorage.getItem(POSTS_KEY)) {\n                const samplePosts = [\n                    {\n                        id: Date.now(),\n                        title: \"Bitcoin Surges Past $100,000\",\n                        category: \"crypto\",\n                        excerpt: \"Bitcoin reaches new all-time high\",\n                        author: \"Sarah Mitchell\",\n                        date: new Date().toISOString(),\n                        status: \"published\",\n                        featured: true,\n                        image: \"https://via.placeholder.com/800x400/8b5cf6/ffffff?text=Bitcoin\"\n                    }\n                ];\n                localStorage.setItem(POSTS_KEY, JSON.stringify(samplePosts));\n            }\n        }\n\n        // ===== INIT =====\n        document.addEventListener('DOMContentLoaded', () => {\n            initializePosts();\n            updateDashboard();\n            setupEventListeners();\n        });\n\n        // ===== EVENT LISTENERS =====\n        function setupEventListeners() {\n            document.getElementById('postForm').addEventListener('submit', savePost);\n            document.getElementById('editForm').addEventListener('submit', saveEditedPost);\n        }\n\n        // ===== DASHBOARD =====\n        function updateDashboard() {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const total = posts.length;\n            const published = posts.filter(p => p.status === 'published').length;\n            const scheduled = posts.filter(p => p.status === 'scheduled').length;\n            const drafts = posts.filter(p => p.status === 'draft').length;\n\n            document.getElementById('totalPosts').textContent = total;\n            document.getElementById('publishedPosts').textContent = published;\n            document.getElementById('scheduledPosts').textContent = scheduled;\n            document.getElementById('draftPosts').textContent = drafts;\n        }\n\n        // ===== SECTION NAVIGATION =====\n        function showSection(sectionId) {\n            // Hide all sections\n            document.querySelectorAll('.section').forEach(section => {\n                section.style.display = 'none';\n            });\n\n            // Show selected section\n            document.getElementById(sectionId).style.display = 'block';\n\n            // Update nav items\n            document.querySelectorAll('.nav-item').forEach(item => {\n                item.classList.remove('active');\n            });\n            event.target.classList.add('active');\n\n            // Load content for specific sections\n            if (sectionId === 'posts') loadAllPosts();\n            if (sectionId === 'schedule') loadScheduledPosts();\n            if (sectionId === 'amp') loadAMPStories();\n        }\n\n        // ===== POST MANAGEMENT =====\n        function savePost(e) {\n            e.preventDefault();\n\n            const post = {\n                id: Date.now(),\n                title: document.getElementById('title').value,\n                category: document.getElementById('category').value,\n                excerpt: document.getElementById('excerpt').value,\n                content: document.getElementById('content').value,\n                author: document.getElementById('author').value,\n                image: document.getElementById('image').value,\n                tags: document.getElementById('tags').value.split(',').map(t => t.trim()),\n                readingTime: document.getElementById('readingTime').value,\n                featured: document.getElementById('featured').checked,\n                date: document.getElementById('publishDate').value,\n                status: document.getElementById('status').value,\n                createdAt: new Date().toISOString()\n            };\n\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            posts.push(post);\n            localStorage.setItem(POSTS_KEY, JSON.stringify(posts));\n\n            showAlert('Post saved successfully!', 'success');\n            resetForm();\n            updateDashboard();\n\n            // Sync to main website\n            syncPostsToWebsite();\n        }\n\n        function loadAllPosts() {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const tbody = document.getElementById('postsTableBody');\n\n            tbody.innerHTML = posts.map(post => `\n                <tr>\n                    <td>${post.title}</td>\n                    <td><span style=\"text-transform: capitalize;\">${post.category}</span></td>\n                    <td>${post.author}</td>\n                    <td>${new Date(post.date).toLocaleDateString()}</td>\n                    <td>\n                        <span class=\"status-badge status-${post.status}\">${post.status.toUpperCase()}</span>\n                    </td>\n                    <td>\n                        <div class=\"action-buttons\">\n                            <button class=\"btn btn-secondary btn-small\" onclick=\"editPost(${post.id})\">Edit</button>\n                            <button class=\"btn btn-danger btn-small\" onclick=\"deletePost(${post.id})\">Delete</button>\n                        </div>\n                    </td>\n                </tr>\n            `).join('');\n        }\n\n        function loadScheduledPosts() {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const scheduled = posts.filter(p => p.status === 'scheduled');\n            const tbody = document.getElementById('scheduledTableBody');\n\n            if (scheduled.length === 0) {\n                tbody.innerHTML = '<tr><td colspan=\"5\" style=\"text-align: center; color: var(--text-muted);\">No scheduled posts</td></tr>';\n                return;\n            }\n\n            tbody.innerHTML = scheduled.map(post => `\n                <tr>\n                    <td>${post.title}</td>\n                    <td><span style=\"text-transform: capitalize;\">${post.category}</span></td>\n                    <td>${new Date(post.date).toLocaleString()}</td>\n                    <td>\n                        <input type=\"checkbox\" checked>\n                    </td>\n                    <td>\n                        <div class=\"action-buttons\">\n                            <button class=\"btn btn-success btn-small\" onclick=\"publishPost(${post.id})\">Publish Now</button>\n                            <button class=\"btn btn-danger btn-small\" onclick=\"deletePost(${post.id})\">Cancel</button>\n                        </div>\n                    </td>\n                </tr>\n            `).join('');\n        }\n\n        function editPost(id) {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const post = posts.find(p => p.id === id);\n\n            if (post) {\n                document.getElementById('editTitle').value = post.title;\n                document.getElementById('editStatus').value = post.status;\n                document.getElementById('editForm').dataset.postId = id;\n                document.getElementById('editModal').classList.add('active');\n            }\n        }\n\n        function saveEditedPost(e) {\n            e.preventDefault();\n            const postId = parseInt(document.getElementById('editForm').dataset.postId);\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const post = posts.find(p => p.id === postId);\n\n            if (post) {\n                post.title = document.getElementById('editTitle').value;\n                post.status = document.getElementById('editStatus').value;\n                localStorage.setItem(POSTS_KEY, JSON.stringify(posts));\n                closeModal();\n                loadAllPosts();\n                updateDashboard();\n                showAlert('Post updated successfully!', 'success');\n            }\n        }\n\n        function deletePost(id) {\n            if (confirm('Are you sure you want to delete this post?')) {\n                let posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n                posts = posts.filter(p => p.id !== id);\n                localStorage.setItem(POSTS_KEY, JSON.stringify(posts));\n                loadAllPosts();\n                updateDashboard();\n                showAlert('Post deleted successfully!', 'success');\n            }\n        }\n\n        function publishPost(id) {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            const post = posts.find(p => p.id === id);\n            if (post) {\n                post.status = 'published';\n                post.date = new Date().toISOString();\n                localStorage.setItem(POSTS_KEY, JSON.stringify(posts));\n                loadScheduledPosts();\n                updateDashboard();\n                showAlert('Post published successfully!', 'success');\n            }\n        }\n\n        // ===== AMP STORIES =====\n        function loadAMPStories() {\n            const stories = JSON.parse(localStorage.getItem(AMP_STORIES_KEY) || '[]');\n            const tbody = document.getElementById('ampStoriesBody');\n\n            if (stories.length === 0) {\n                tbody.innerHTML = '<tr><td colspan=\"5\" style=\"text-align: center; color: var(--text-muted);\">No AMP Web Stories yet</td></tr>';\n                return;\n            }\n\n            tbody.innerHTML = stories.map(story => `\n                <tr>\n                    <td>${story.title}</td>\n                    <td>${story.pages.length}</td>\n                    <td>${new Date(story.createdAt).toLocaleDateString()}</td>\n                    <td><span class=\"status-badge status-published\">PUBLISHED</span></td>\n                    <td>\n                        <div class=\"action-buttons\">\n                            <button class=\"btn btn-secondary btn-small\" onclick=\"viewAMPStory(${story.id})\">View</button>\n                            <button class=\"btn btn-danger btn-small\" onclick=\"deleteAMPStory(${story.id})\">Delete</button>\n                        </div>\n                    </td>\n                </tr>\n            `).join('');\n        }\n\n        function createAMPStory() {\n            const posts = JSON.parse(localStorage.getItem(POSTS_KEY) || '[]');\n            if (posts.length === 0) {\n                showAlert('Create a post first before creating an AMP Web Story', 'danger');\n                return;\n            }\n\n            const post = posts[posts.length - 1];\n            const story = {\n                id: Date.now(),\n                title: post.title,\n                category: post.category,\n                pages: [\n                    {\n                        id: 1,\n                        type: 'cover',\n                        title: post.title,\n                        subtitle: post.excerpt,\n                        image: post.image\n                    },\n                    {\n                        id: 2,\n                        type: 'content',\n                        title: 'Story Details',\n                        content: post.excerpt,\n                        image: post.image\n                    },\n                    {\n                        id: 3,\n                        type: 'cta',\n                        title: 'Read Full Article',\n                        ctaText: 'Read More',\n                        ctaLink: '/index.html'\n                    }\n                ],\n                createdAt: new Date().toISOString()\n            };\n\n            let stories = JSON.parse(localStorage.getItem(AMP_STORIES_KEY) || '[]');\n            stories.push(story);\n            localStorage.setItem(AMP_STORIES_KEY, JSON.stringify(stories));\n            loadAMPStories();\n            showAlert('AMP Web Story created successfully!', 'success');\n        }\n\n        function deleteAMPStory(id) {\n            if (confirm('Delete this AMP Web Story?')) {\n                let stories = JSON.parse(localStorage.getItem(AMP_STORIES_KEY) || '[]');\n                stories = stories.filter(s => s.id !== id);\n                localStorage.setItem(AMP_STORIES_KEY, JSON.stringify(stories));\n                loadAMPStories();\n                showAlert('AMP Web Story deleted', 'success');\n            }\n        }\n\n        // ===== HELPERS =====\n        function resetForm() {\n            document.getElementById('postForm').reset();\n            const now = new Date();\n            now.setHours(now.getHours() + 1);\n            document.getElementById('publishDate').value = now.toISOString().slice(0, 16);\n        }\n\n        function closeModal() {\n            document.getElementById('editModal').classList.remove('active');\n        }\n\n        function showAlert(message, type) {\n            const alertContainer = document.getElementById('alertContainer');\n            if (!alertContainer) return;\n\n            const alert = document.createElement('div');\n            alert.className = `alert alert-${type} show`;\n            alert.textContent = message;\n            alertContainer.innerHTML = '';\n            alertContainer.appendChild(alert);\n\n            setTimeout(() => {\n                alert.classList.remove('show');\n            }, 3000);\n        }\n\n        function syncPostsToWebsite() {\n            // This would sync posts to the main website\n            // In production, use API calls\n            localStorage.setItem('website_posts_synced', new Date().toISOString());\n        }\n\n        function logout() {\n            if (confirm('Are you sure you want to logout?')) {\n                window.location.href = '../index.html';\n            }\n        }\n\n        // Set default publish date to 1 hour from now\n        window.addEventListener('load', () => {\n            const now = new Date();\n            now.setHours(now.getHours() + 1);\n            document.getElementById('publishDate').value = now.toISOString().slice(0, 16);\n        });\n    </script>\n</body>\n</html>
