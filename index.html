@@ -498,6 +498,11 @@
             gap: 15px;
             padding: 12px 0;
             border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+        }
+
+        .trending-item:hover {
+            background: var(--light-gray);
         }
 
         .trending-item:last-child {
@@ -523,92 +528,6 @@
         .trending-meta {
             font-size: 12px;
             color: var(--secondary-text);
-        }
-
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-            border-bottom: 1px dotted var(--secondary-text);
-        }
-
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--dark-text);
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-        }
-
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: var(--dark-text) transparent transparent transparent;
-        }
-
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 30px;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .toggle-slider {
-            background-color: var(--primary-red);
-        }
-
-        input:checked + .toggle-slider:before {
-            transform: translateX(30px);
         }
 
         /* FOOTER */
@@ -876,81 +795,123 @@
     </footer>
 
     <script>
-        let allPosts = [
-            {
-                id: 'post1',
-                title: 'Bitcoin Reaches New Heights',
-                category: 'crypto',
-                excerpt: 'Cryptocurrency market shows strong growth signals as Bitcoin breaks through resistance levels.',
-                author: 'Staff',
-                date: '2026-01-15',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Bitcoin',
-                featured: false,
-                slug: 'posts/post1.html'
-            },
-            {
-                id: 'post2',
-                title: 'Stock Market Rally Continues',
-                category: 'stocks',
-                excerpt: 'Major indices gain momentum as investors show confidence in the economic outlook.',
-                author: 'Staff',
-                date: '2026-01-14',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Stocks',
-                featured: false,
-                slug: 'posts/post2.html'
-            },
-            {
-                id: 'post3',
-                title: 'Fed Announces Policy Decision',
-                category: 'economy',
-                excerpt: 'Central bank provides guidance on future monetary policy stance.',
-                author: 'Staff',
-                date: '2026-01-13',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Economy',
-                featured: false,
-                slug: 'posts/post3.html'
-            },
-            {
-                id: 'post4',
-                title: 'Ethereum Upgrade Complete',
-                category: 'crypto',
-                excerpt: 'Major network upgrade enhances scalability and reduces transaction costs.',
-                author: 'Staff',
-                date: '2026-01-12',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Ethereum',
-                featured: false,
-                slug: 'posts/post4.html'
-            },
-            {
-                id: 'post5',
-                title: 'Tech Stocks Lead Market Gains',
-                category: 'tech',
-                excerpt: 'Technology sector outperforms as AI initiatives fuel investor interest.',
-                author: 'Staff',
-                date: '2026-01-11',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Tech',
-                featured: false,
-                slug: 'posts/post5.html'
-            },
-            {
-                id: 'post6',
-                title: 'Dollar Strengthens Against Peers',
-                category: 'forex',
-                excerpt: 'Currency markets react to economic data and interest rate expectations.',
-                author: 'Staff',
-                date: '2026-01-10',
-                image: 'https://via.placeholder.com/800x400/cc0000/ffffff?text=Forex',
-                featured: false,
-                slug: 'posts/post6.html'
-            }
-        ];
-
+        // ===== GITHUB CONFIGURATION =====
+        const GITHUB_REPO = 'shivamanbhulemoney/moneymarketcap';
+        const GITHUB_BRANCH = 'main';
+        
+        let allPosts = [];
         let currentFilter = 'all';
         let userRating = 0;
 
+        // ===== LOAD POSTS FROM GITHUB API =====
+        async function loadPostsFromGitHub() {
+            try {
+                // Fetch directory listing from GitHub
+                const response = await fetch(
+                    `https://api.github.com/repos/${GITHUB_REPO}/contents/posts?ref=${GITHUB_BRANCH}`
+                );
+                
+                if (!response.ok) {
+                    console.error('GitHub API error:', response.status);
+                    return;
+                }
+                
+                const files = await response.json();
+                
+                // Filter only HTML files
+                const htmlFiles = files.filter(file => file.name.endsWith('.html'));
+                
+                // Extract post metadata from each HTML file
+                for (const file of htmlFiles) {
+                    await extractPostMetadata(file);
+                }
+                
+                // Sort by date (newest first)
+                allPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                // Render content
+                renderContent();
+                
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                // Fallback to render anyway
+                renderContent();
+            }
+        }
+
+        // ===== EXTRACT POST METADATA =====
+        async function extractPostMetadata(file) {
+            try {
+                const response = await fetch(file.download_url);
+                const htmlContent = await response.text();
+                
+                // Parse HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                
+                // Extract metadata
+                const title = doc.querySelector('h1, .article-title')?.textContent || doc.querySelector('title')?.textContent || 'Untitled';
+                const excerpt = doc.querySelector('meta[name="description"]')?.getAttribute('content') || doc.querySelector('.story-excerpt, .article-meta')?.textContent || '';
+                const categoryLabel = doc.querySelector('.article-label, .story-label')?.textContent || 'NEWS';
+                const category = categoryLabel.toLowerCase();
+                const author = doc.querySelector('meta[name="article:author"]')?.getAttribute('content') || 'Staff';
+                const dateStr = doc.querySelector('meta[name="article:published_time"]')?.getAttribute('content');
+                const date = dateStr ? new Date(dateStr).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+                const image = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || doc.querySelector('img')?.src || 'https://via.placeholder.com/800x400/cccccc/ffffff?text=News';
+                
+                const post = {
+                    id: file.name.replace('.html', ''),
+                    title: title.replace(' - MoneyMarketCap', '').trim(),
+                    category: mapCategory(category),
+                    excerpt: excerpt.substring(0, 150) + '...',
+                    author: author,
+                    date: date,
+                    image: image,
+                    featured: false,
+                    slug: `posts/${file.name}`
+                };
+                
+                if (allPosts.find(p => p.id === post.id) === undefined) {
+                    allPosts.push(post);
+                }
+                
+            } catch (error) {
+                console.error(`Error extracting metadata from ${file.name}:`, error);
+            }
+        }
+
+        // ===== MAP CATEGORY =====
+        function mapCategory(category) {
+            const categoryMap = {
+                'crypto': 'crypto',
+                'cryptocurrency': 'crypto',
+                'bitcoin': 'crypto',
+                'ethereum': 'crypto',
+                'stocks': 'stocks',
+                'stock': 'stocks',
+                'nasdaq': 'stocks',
+                'sp500': 'stocks',
+                'forex': 'forex',
+                'currency': 'forex',
+                'economy': 'economy',
+                'economic': 'economy',
+                'fed': 'economy',
+                'inflation': 'economy',
+                'tech': 'tech',
+                'technology': 'tech',
+                'ai': 'tech',
+                'news': 'economy'
+            };
+            
+            for (const [key, value] of Object.entries(categoryMap)) {
+                if (category.includes(key)) return value;
+            }
+            return 'economy';
+        }
+
         // ===== INITIALIZATION =====
         document.addEventListener('DOMContentLoaded', () => {
-            renderContent();
+            loadPostsFromGitHub();
             setupEventListeners();
             updateTimestamp();
             setupRatingStars();
