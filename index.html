@@ -85,17 +85,16 @@
             gap: 10px;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-red);
-            border-radius: 4px;
+        .logo-image {
+            height: 50px;
+            width: auto;
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+        }
+
+        .logo-image img {
+            height: 100%;
+            width: auto;
         }
 
         nav {
@@ -692,14 +691,8 @@
                 padding: 0 15px;
             }
 
-            .logo {
-                font-size: 20px;
-            }
-
-            .logo-icon {
-                width: 30px;
-                height: 30px;
-                font-size: 18px;
+            .logo-image {
+                height: 40px;
             }
 
             .story-title {
@@ -733,9 +726,8 @@
             </div>
         </div>
         <div class="header-container">
-            <a href="/" class="logo">
-                <span class="logo-icon">M</span>
-                <span>MoneyMarketCap</span>
+            <a href="/" class="logo logo-image">
+                <img src="logo.png" alt="MoneyMarketCap Logo">
             </a>
             <nav>
                 <a href="#" class="nav-link active" data-category="all">HOME</a>
